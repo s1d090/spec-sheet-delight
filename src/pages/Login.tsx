@@ -19,7 +19,8 @@ const Login = () => {
     setEmail, 
     password, 
     setPassword, 
-    handleLogin 
+    handleLogin,
+    isLoading
   } = useAuthentication(loginType);
   
   return (
@@ -35,6 +36,7 @@ const Login = () => {
             setPassword={setPassword}
             handleLogin={handleLogin}
             setForgotPasswordOpen={setForgotPasswordOpen}
+            isLoading={isLoading}
           />
         }
         adminContent={
@@ -45,6 +47,7 @@ const Login = () => {
             setPassword={setPassword}
             handleLogin={handleLogin}
             setForgotPasswordOpen={setForgotPasswordOpen}
+            isLoading={isLoading}
           />
         }
       />

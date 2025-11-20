@@ -10,6 +10,7 @@ interface AdminLoginFormProps {
   setPassword: (password: string) => void;
   handleLogin: (e: React.FormEvent) => void;
   setForgotPasswordOpen: (open: boolean) => void;
+  isLoading?: boolean;
 }
 
 export const AdminLoginForm = ({ 
@@ -18,7 +19,8 @@ export const AdminLoginForm = ({
   password, 
   setPassword, 
   handleLogin,
-  setForgotPasswordOpen
+  setForgotPasswordOpen,
+  isLoading = false
 }: AdminLoginFormProps) => {
   return (
     <form onSubmit={handleLogin}>
@@ -54,12 +56,12 @@ export const AdminLoginForm = ({
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <p className="text-xs text-muted-foreground">Demo: admin@mindease.com / admin123</p>
+          
         </div>
       </div>
       
-      <Button type="submit" className="w-full mt-6">
-        Sign In
+      <Button type="submit" className="w-full mt-6" disabled={isLoading}>
+        {isLoading ? "Logging in..." : "Sign In"}
       </Button>
     </form>
   );

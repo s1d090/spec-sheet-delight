@@ -1,72 +1,45 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { universities } from "@/components/login/StudentLoginForm";
-
-// Demo credentials
-const demoStudentCredentials = {
-  email: "student@bison.howard.edu",
-  password: "password123"
-};
-
-const demoAdminCredentials = {
-  email: "admin@mindease.com",
-  password: "admin123"
-};
+import { supabase } from "@/integrations/supabase/client";
 
 export const useAuthentication = (loginType: "student" | "admin") => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!email || !password) {
       toast.error("Please fill in all fields");
       return;
     }
-    
-    // Demo authentication logic
-    if (loginType === "student") {
-      const universityDomain = email.split('@')[1];
-      const isValidUniversityEmail = universities.some(u => u.domain === universityDomain);
-      
-      if (!isValidUniversityEmail) {
-        toast.error(`Please use your university email address`);
+
+    setIsLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        toast.error(error.message);
         return;
       }
-      
-      if (email === demoStudentCredentials.email && password === demoStudentCredentials.password) {
-        localStorage.setItem("mindease_user", JSON.stringify({
-          type: "student",
-          name: "Sam Johnson",
-          university: "Howard University",
-          email: email,
-          username: "samjohnson"
-        }));
-        toast.success("Student login successful");
+
+      if (data.user) {
+        toast.success("Login successful!");
         navigate("/");
-      } else {
-        toast.error("Invalid credentials. Try using: student@bison.howard.edu / password123");
       }
-    } else {
-      // Admin login
-      if (email === demoAdminCredentials.email && password === demoAdminCredentials.password) {
-        localStorage.setItem("mindease_user", JSON.stringify({
-          type: "admin",
-          name: "Admin User",
-          email: email,
-          username: "adminuser"
-        }));
-        toast.success("Admin login successful");
-        navigate("/");
-      } else {
-        toast.error("Invalid admin credentials. Try using: admin@mindease.com / admin123");
-      }
+    } catch (error: any) {
+      toast.error(error.message || "An error occurred during login");
+    } finally {
+      setIsLoading(false);
     }
   };
   
-  return { email, setEmail, password, setPassword, handleLogin };
+  return { email, setEmail, password, setPassword, handleLogin, isLoading };
 };
