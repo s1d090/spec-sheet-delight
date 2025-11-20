@@ -31,6 +31,12 @@ export const useAuthentication = (loginType: "student" | "admin") => {
       }
 
       if (data.user) {
+        // Check if email is verified
+        if (!data.user.email_confirmed_at) {
+          toast.error("Please verify your email before logging in. Check your inbox for the verification link.");
+          await supabase.auth.signOut();
+          return;
+        }
         toast.success("Login successful!");
         navigate("/");
       }
