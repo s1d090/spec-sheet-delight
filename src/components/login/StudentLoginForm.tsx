@@ -18,12 +18,12 @@ interface StudentLoginFormProps {
 
 // Demo credentials
 const demoStudentCredentials = {
-  email: "student@howard.edu",
+  email: "student@bison.howard.edu",
   password: "password123"
 };
 
 export const universities = [
-  { name: "Howard University", domain: "howard.edu" },
+  { name: "Howard University", domain: "bison.howard.edu" },
   { name: "Georgetown University", domain: "georgetown.edu" },
   { name: "University of Maryland", domain: "umd.edu" },
   { name: "George Washington University", domain: "gwu.edu" },
@@ -98,7 +98,7 @@ export const StudentLoginForm = ({
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <p className="text-xs text-muted-foreground">Demo: student@howard.edu / password123</p>
+          <p className="text-xs text-muted-foreground">Demo: student@bison.howard.edu / password123</p>
         </div>
       </div>
       
