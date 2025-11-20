@@ -11,7 +11,7 @@ import { ArrowLeft } from "lucide-react";
 import VerificationCode from "@/components/signup/VerificationCode";
 
 const universities = [
-  { name: "Howard University", domain: "howard.edu" },
+  { name: "Howard University", domain: "bison.howard.edu" },
   { name: "Georgetown University", domain: "georgetown.edu" },
   { name: "University of Maryland", domain: "umd.edu" },
   { name: "George Washington University", domain: "gwu.edu" },

@@ -65,7 +65,7 @@ const CounselorLogin = () => {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="counselor@university.edu"
+                  placeholder="firstname.lastname@howard.edu"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -100,7 +100,7 @@ const CounselorLogin = () => {
                 <div className="flex items-center gap-2">
                   <Shield className="h-4 w-4" />
                   <AlertDescription className="text-xs">
-                    Demo credentials: counselor@mindease.com / counselor123
+                    Demo credentials: counselor@howard.edu / counselor123
                   </AlertDescription>
                 </div>
               </Alert>

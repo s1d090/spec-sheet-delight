@@ -6,7 +6,7 @@ import { universities } from "@/components/login/StudentLoginForm";
 
 // Demo credentials
 const demoStudentCredentials = {
-  email: "student@howard.edu",
+  email: "student@bison.howard.edu",
   password: "password123"
 };
 
@@ -49,7 +49,7 @@ export const useAuthentication = (loginType: "student" | "admin") => {
         toast.success("Student login successful");
         navigate("/");
       } else {
-        toast.error("Invalid credentials. Try using: student@howard.edu / password123");
+        toast.error("Invalid credentials. Try using: student@bison.howard.edu / password123");
       }
     } else {
       // Admin login
