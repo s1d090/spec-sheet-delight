@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
-import VerificationCode from "@/components/signup/VerificationCode";
+import { supabase } from "@/integrations/supabase/client";
 
 const universities = [
   { name: "Howard University", domain: "bison.howard.edu" },
@@ -20,7 +20,7 @@ const universities = [
 
 const SignUp = () => {
   const navigate = useNavigate();
-  const [step, setStep] = useState(1); // 1: Form, 2: Verification
+  const [isLoading, setIsLoading] = useState(false);
   
   const [formData, setFormData] = useState({
     fullName: "",
@@ -95,38 +95,43 @@ const SignUp = () => {
     return valid;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {
       return;
     }
 
-    // Send verification code to email (in a real app)
-    // Here we just move to the verification step
-    toast.info(`Verification code sent to ${formData.email}`);
-    setStep(2);
-  };
-  
-  const handleVerificationComplete = () => {
-    // Create account after verification is complete
-    toast.success("Account created successfully!");
-    
-    // Store the new user in localStorage (in a real app, this would be handled by a backend)
-    localStorage.setItem("mindease_user", JSON.stringify({
-      type: "student",
-      name: formData.fullName,
-      username: formData.username,
-      university: formData.university,
-      email: formData.email
-    }));
-    
-    navigate("/");
-  };
-  
-  const handleResendCode = () => {
-    // In a real app, this would resend the code
-    console.log("Resending code to", formData.email);
+    setIsLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            username: formData.username,
+            full_name: formData.fullName,
+            university: formData.university,
+          },
+        },
+      });
+
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+
+      if (data.user) {
+        toast.success("Account created successfully!");
+        navigate("/");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "An error occurred during sign up");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const renderForm = () => (
@@ -225,8 +230,8 @@ const SignUp = () => {
         )}
       </div>
       
-      <Button type="submit" className="w-full mt-6">
-        Create Account
+      <Button type="submit" className="w-full mt-6" disabled={isLoading}>
+        {isLoading ? "Creating Account..." : "Create Account"}
       </Button>
     </form>
   );
@@ -249,28 +254,18 @@ const SignUp = () => {
                 variant="ghost" 
                 size="icon" 
                 className="rounded-full mr-2"
-                onClick={() => step === 1 ? navigate("/login") : setStep(1)}
+                onClick={() => navigate("/login")}
               >
                 <ArrowLeft size={18} />
               </Button>
-              <CardTitle>{step === 1 ? "Create an Account" : "Verify Email"}</CardTitle>
+              <CardTitle>Create an Account</CardTitle>
             </div>
             <CardDescription>
-              {step === 1 
-                ? "Join MindEase to start your wellness journey" 
-                : "Enter the verification code sent to your email"}
+              Join MindEase to start your wellness journey
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {step === 1 ? (
-              renderForm()
-            ) : (
-              <VerificationCode 
-                email={formData.email}
-                onVerify={handleVerificationComplete}
-                onResend={handleResendCode}
-              />
-            )}
+            {renderForm()}
           </CardContent>
           <CardFooter className="flex justify-center">
             <p className="text-sm text-muted-foreground">

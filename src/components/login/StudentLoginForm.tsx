@@ -14,13 +14,8 @@ interface StudentLoginFormProps {
   setPassword: (password: string) => void;
   handleLogin: (e: React.FormEvent) => void;
   setForgotPasswordOpen: (open: boolean) => void;
+  isLoading?: boolean;
 }
-
-// Demo credentials
-const demoStudentCredentials = {
-  email: "student@bison.howard.edu",
-  password: "password123"
-};
 
 export const universities = [
   { name: "Howard University", domain: "bison.howard.edu" },
@@ -36,7 +31,8 @@ export const StudentLoginForm = ({
   password, 
   setPassword, 
   handleLogin,
-  setForgotPasswordOpen
+  setForgotPasswordOpen,
+  isLoading = false
 }: StudentLoginFormProps) => {
   const navigate = useNavigate();
   const [selectedUniversity, setSelectedUniversity] = useState<string | null>("Howard University"); // Default to Howard
@@ -98,12 +94,12 @@ export const StudentLoginForm = ({
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <p className="text-xs text-muted-foreground">Demo: student@bison.howard.edu / password123</p>
+          
         </div>
       </div>
       
-      <Button type="submit" className="w-full mt-6">
-        Sign In
+      <Button type="submit" className="w-full mt-6" disabled={isLoading}>
+        {isLoading ? "Logging in..." : "Sign In"}
       </Button>
       
       <div className="text-xs text-center text-gray-500 mt-4">

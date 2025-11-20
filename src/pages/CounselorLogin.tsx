@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
@@ -8,36 +7,45 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { MessageSquare, Shield } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const CounselorLogin = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
-  const [loading, setLoading] = useState(false);
   
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     
-    // Demo login for counselors
-    setTimeout(() => {
-      setLoading(false);
-      
-      if (email.includes("counselor") && password === "counselor123") {
-        localStorage.setItem("mindease_user", JSON.stringify({
-          type: "counselor",
-          name: "Dr. Carter",
-          university: "Howard University",
-          email: email,
-        }));
-        
-        toast.success("Welcome back, Dr. Carter");
-        navigate("/counselor-dashboard");
-      } else {
-        toast.error("Invalid credentials. Please try again.");
+    if (!email || !password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        toast.error(error.message);
+        return;
       }
-    }, 1500);
+
+      if (data.user) {
+        toast.success("Counselor login successful!");
+        navigate("/counselor-dashboard");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "An error occurred during login");
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   return (
@@ -96,18 +104,10 @@ const CounselorLogin = () => {
                 </p>
               </div>
               
-              <Alert className="bg-amber-50 text-amber-800 border-amber-200">
-                <div className="flex items-center gap-2">
-                  <Shield className="h-4 w-4" />
-                  <AlertDescription className="text-xs">
-                    Demo credentials: counselor@howard.edu / counselor123
-                  </AlertDescription>
-                </div>
-              </Alert>
             </CardContent>
             <CardFooter>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Authenticating..." : "Sign In"}
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Authenticating..." : "Sign In"}
               </Button>
             </CardFooter>
           </form>
