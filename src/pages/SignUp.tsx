@@ -124,8 +124,12 @@ const SignUp = () => {
       }
 
       if (data.user) {
-        toast.success("Account created successfully!");
-        navigate("/");
+        toast.success(
+          "Account created! Please check your email to verify your account.",
+          { duration: 6000 }
+        );
+        // Redirect to login after showing message
+        setTimeout(() => navigate("/login"), 2000);
       }
     } catch (error: any) {
       toast.error(error.message || "An error occurred during sign up");
